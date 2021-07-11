@@ -1,0 +1,55 @@
+version: "3.7"
+services:
+  rumahmakan_db:
+    container_name: buku_db
+    image: mysql:8.0
+    restart: always
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - buku_volume:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: riki
+      MYSQL_DATABASE: buku
+      MYSQL_USER: riki
+      MYSQL_PASSWORD: riki
+    networks:
+      - buku_network
+    ports:
+      - "3301:3306"
+
+  pelanggan_db:
+    container_name: peminjam_db
+    image: mysql:8.0
+    restart: always
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - peminjam_volume:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: riki
+      MYSQL_DATABASE: peminjam_buku
+      MYSQL_USER: riki
+      MYSQL_PASSWORD: riki
+    networks:
+      - buku_network
+    ports:
+      - "3302:3306"
+
+  perpus_app:
+    container_name: perpus_app
+    build: .
+    restart: always
+    environment:
+      BASE_URL: http://192.168.78.128/
+    depends_on:
+      - buku_db
+      - peminjam_db
+    networks:
+      - buku_network
+    ports:
+      - "8090:80"
+
+networks:
+  buku_network:
+volumes:
+  buku_volume:
+  peminjam_volume:
